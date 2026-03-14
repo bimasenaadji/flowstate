@@ -16,7 +16,8 @@ export default function TransactionForm({
     const formData = new FormData(e.currentTarget);
 
     const name = formData.get("transaction-name") as string;
-    const amount = Number(formData.get("amount"));
+    const rawAmount = formData.get("amount") as string;
+    const amount = Number(rawAmount.replace(/\D/g, ""));
     const type = formData.get("income-type") as
       | "income"
       | "expense"
@@ -37,6 +38,18 @@ export default function TransactionForm({
     onAddTransaction(newTrx);
 
     e.currentTarget.reset();
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const cleanValue = value.replace(/\D/g, "");
+    if (cleanValue === "") {
+      e.target.value = "";
+      return;
+    }
+
+    const newValue = new Intl.NumberFormat("id-ID").format(Number(cleanValue));
+    e.target.value = newValue;
   };
 
   return (
@@ -61,9 +74,11 @@ export default function TransactionForm({
           </label>
           <input
             className="px-3 py-1 border border-border rounded-sm"
-            type="number"
+            type="text"
             name="amount"
             id="amount"
+            inputMode="numeric"
+            onChange={handleAmountChange}
           />
         </div>
         <div className="flex flex-col space-y-2">
