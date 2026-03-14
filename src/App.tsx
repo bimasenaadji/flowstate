@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardSummary from "./components/dashboard/DashboardSummary";
 import TransactionForm from "./components/dashboard/TransactionForm";
 import TransactionHistory from "./components/dashboard/TransactionHistory";
@@ -7,8 +7,17 @@ import { initialTransactions } from "./data/dummyData";
 import { type Transaction } from "./types"; // Pastikan import ini ada
 
 function App() {
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(initialTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    const transactions = localStorage.getItem("transactions");
+    if (transactions) {
+      return JSON.parse(transactions);
+    }
+    return initialTransactions;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [transactions]);
 
   const totalIncome = transactions
     .filter((trx) => trx.type === "income")
